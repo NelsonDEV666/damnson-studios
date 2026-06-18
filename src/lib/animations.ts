@@ -1,10 +1,6 @@
-/**
- * Damnson Studios — Animation Utilities
- * useInView + requestAnimationFrame helpers
- */
 import { useEffect, useRef, useState } from "react";
 
-/** Returns true once the element scrolls into the viewport. */
+
 export function useInView(options?: IntersectionObserverInit) {
   const ref = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
@@ -20,7 +16,7 @@ export function useInView(options?: IntersectionObserverInit) {
 
     observer.observe(ref.current);
     return () => observer.disconnect();
-  }, []);
+  }, [options]);
 
   return { ref, inView };
 }
@@ -28,12 +24,13 @@ export function useInView(options?: IntersectionObserverInit) {
 /** Eased counter driven by requestAnimationFrame. */
 export function useAnimatedCounter(target: number, duration = 2000, enabled = true) {
   const [count, setCount] = useState(0);
-  const rafRef   = useRef<number>();
-  const startRef = useRef<number>();
+  // 🧠 FIX: Explicitly handle number | null type signatures to comply with SSR rules
+  const rafRef   = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
-    startRef.current = undefined;
+    startRef.current = null;
 
     const tick = (timestamp: number) => {
       if (!startRef.current) startRef.current = timestamp;
